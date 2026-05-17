@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niassist</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Segoe UI, sans-serif;
+        }
+
+        body{
+
+            height:100vh;
+
+            overflow:hidden;
+
+            background:#061312;
+
+            display:flex;
+
+            justify-content:center;
+
+            align-items:center;
+
+            color:white;
+
+            position:relative;
+        }
+
+        /* Background Glow */
+
+        body::before{
+
+            content:"";
+
+            position:absolute;
+
+            width:500px;
+            height:500px;
+
+            background:#10B981;
+
+            border-radius:50%;
+
+            filter:blur(180px);
+
+            top:-150px;
+            left:-100px;
+
+            opacity:0.25;
+
+            animation:float 8s ease-in-out infinite;
+        }
+
+        body::after{
+
+            content:"";
+
+            position:absolute;
+
+            width:450px;
+            height:450px;
+
+            background:#14B8A6;
+
+            border-radius:50%;
+
+            filter:blur(180px);
+
+            bottom:-150px;
+            right:-100px;
+
+            opacity:0.2;
+
+            animation:float2 10s ease-in-out infinite;
+        }
+
+        @keyframes float{
+
+            0%{
+                transform:translateY(0px);
+            }
+
+            50%{
+                transform:translateY(30px);
+            }
+
+            100%{
+                transform:translateY(0px);
+            }
+        }
+
+        @keyframes float2{
+
+            0%{
+                transform:translateY(0px);
+            }
+
+            50%{
+                transform:translateY(-30px);
+            }
+
+            100%{
+                transform:translateY(0px);
+            }
+        }
+
+        .container{
+
+            width:100vw;
+
+            height:100vh;
+
+            border-radius:0;
+
+            max-width:1400px;
+
+
+            background:rgba(255,255,255,0.05);
+
+            backdrop-filter:blur(20px);
+
+            border:1px solid rgba(255,255,255,0.08);
+
+
+            overflow:hidden;
+
+            display:flex;
+
+            position:relative;
+
+            z-index:2;
+
+            box-shadow:0 0 50px rgba(0,0,0,0.35);
+        }
+
+        /* Sidebar */
+
+        .sidebar{
+
+            width:300px;
+
+            background:rgba(0,0,0,0.2);
+
+            border-right:1px solid rgba(255,255,255,0.08);
+
+            padding:30px;
+
+            display:flex;
+
+            flex-direction:column;
+        }
+
+        .logo{
+
+            font-size:2.5rem;
+
+            font-weight:700;
+
+            background:linear-gradient(to right,#6EE7B7,#10B981,#14B8A6);
+
+            -webkit-background-clip:text;
+
+            -webkit-text-fill-color:transparent;
+        }
+
+        .subtitle{
+
+            margin-top:10px;
+
+            color:#b5cfc8;
+
+            line-height:1.6;
+        }
+        .suggestion-title{
+
+    color:#8bc5b4;
+
+    font-size:0.9rem;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+    margin-bottom:10px;
+
+    padding-left:5px;
+}
+       .menu{
+
+    margin-top:35px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    overflow-y:auto;
+
+    padding-right:5px;
+
+    max-height:420px;
+}
+
+.menu::-webkit-scrollbar{
+
+    width:5px;
+}
+
+.menu::-webkit-scrollbar-thumb{
+
+    background:rgba(16,185,129,0.25);
+
+    border-radius:20px;
+}
+
+        .menu-item{
+
+    padding:14px 16px;
+
+    border-radius:16px;
+
+    background:rgba(255,255,255,0.025);
+
+    border:1px solid rgba(255,255,255,0.04);
+
+    transition:0.3s;
+
+    cursor:pointer;
+
+    color:#d7e5df;
+
+    line-height:1.5;
+
+    font-size:0.95rem;
+}
+
+        .menu-item:hover{
+
+            background:rgba(16,185,129,0.15);
+
+            border-color:rgba(16,185,129,0.3);
+
+            transform:translateX(5px);
+        }
+
+        .status{
+
+            margin-top:auto;
+
+            padding:20px;
+
+            border-radius:20px;
+
+            background:rgba(255,255,255,0.03);
+
+            border:1px solid rgba(255,255,255,0.06);
+        }
+
+        .online{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:10px;
+
+            margin-top:10px;
+        }
+
+        .dot{
+
+            width:10px;
+            height:10px;
+
+            background:#10B981;
+
+            border-radius:50%;
+
+            animation:pulse 1.5s infinite;
+        }
+
+        @keyframes pulse{
+
+            0%{
+                opacity:0.5;
+                transform:scale(1);
+            }
+
+            50%{
+                opacity:1;
+                transform:scale(1.3);
+            }
+
+            100%{
+                opacity:0.5;
+                transform:scale(1);
+            }
+        }
+
+        /* Chat Area */
+
+        .main{
+
+            flex:1;
+
+            display:flex;
+
+            flex-direction:column;
+        }
+
+        .header{
+
+            height:90px;
+
+            border-bottom:1px solid rgba(255,255,255,0.06);
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            padding:0 35px;
+
+            background:rgba(0,0,0,0.15);
+        }
+
+        .header h2{
+
+            font-size:1.8rem;
+        }
+
+        .header p{
+
+            color:#b5cfc8;
+
+            margin-top:5px;
+        }
+        .top-widgets{
+
+    display:flex;
+
+    gap:18px;
+
+    padding:22px 30px 0 30px;
+}
+
+.widget{
+
+    flex:1;
+
+    background:rgba(255,255,255,0.03);
+
+    border:1px solid rgba(255,255,255,0.06);
+
+    border-radius:22px;
+
+    padding:18px 20px;
+
+    backdrop-filter:blur(12px);
+
+    transition:0.3s;
+}
+
+.widget:hover{
+
+    border-color:rgba(16,185,129,0.25);
+
+    transform:translateY(-2px);
+
+    background:rgba(16,185,129,0.05);
+}
+
+.widget-label{
+
+    color:#8bc5b4;
+
+    font-size:0.8rem;
+
+    letter-spacing:1px;
+
+    margin-bottom:10px;
+}
+
+.widget-value{
+
+    font-size:1.1rem;
+
+    font-weight:600;
+}
+
+.green{
+
+    color:#6EE7B7;
+}
+        .avatar{
+
+            width:50px;
+            height:50px;
+
+            border-radius:18px;
+
+            background:linear-gradient(to right,#10B981,#14B8A6);
+
+            box-shadow:0 0 25px rgba(16,185,129,0.4);
+        }
+
+        /* Chat */
+
+        .chat-box{
+
+            flex:1;
+
+            padding:35px;
+
+            overflow-y:auto;
+        }
+
+        .message{
+
+            max-width:70%;
+
+            padding:18px 22px;
+
+            border-radius:25px;
+
+            margin-bottom:20px;
+
+            line-height:1.8;
+
+            animation:fadeIn 0.3s ease;
+        }
+
+        .bot{
+
+            background:rgba(255,255,255,0.04);
+
+            border:1px solid rgba(255,255,255,0.08);
+
+            backdrop-filter:blur(10px);
+        }
+
+        .user{
+
+            margin-left:auto;
+
+            background:linear-gradient(to right,#10B981,#14B8A6);
+
+            color:white;
+
+            box-shadow:0 0 25px rgba(16,185,129,0.25);
+        }
+
+        @keyframes fadeIn{
+
+            from{
+                opacity:0;
+                transform:translateY(10px);
+            }
+
+            to{
+                opacity:1;
+                transform:translateY(0px);
+            }
+        }
+
+        /* Input */
+
+        .input-area{
+
+            padding:25px;
+
+            border-top:1px solid rgba(255,255,255,0.06);
+
+            display:flex;
+
+            gap:15px;
+
+            background:rgba(0,0,0,0.12);
+        }
+
+        input{
+
+            flex:1;
+
+            padding:18px;
+
+            border:none;
+
+            outline:none;
+
+            border-radius:20px;
+
+            background:rgba(255,255,255,0.05);
+
+            color:white;
+
+            font-size:1rem;
+
+            border:1px solid rgba(255,255,255,0.08);
+        }
+
+        input:focus{
+
+            border-color:#10B981;
+
+            box-shadow:0 0 20px rgba(16,185,129,0.2);
+        }
+
+        button{
+
+            border:none;
+
+            padding:0 24px;
+
+            border-radius:20px;
+
+            cursor:pointer;
+
+            font-weight:600;
+
+            transition:0.3s;
+        }
+
+        .mic-btn{
+
+    background:linear-gradient(to right,#6EE7B7,#10B981);
+
+    color:black;
+
+    transition:0.3s;
+}
+
+.mic-btn:hover{
+
+    animation:pulse 1.5s infinite;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 0 20px rgba(16,185,129,0.3);
+}
+        .send-btn{
+
+            background:linear-gradient(to right,#10B981,#14B8A6);
+
+            color:white;
+        }
+
+        button:hover{
+
+            transform:translateY(-2px);
+
+            box-shadow:0 0 20px rgba(16,185,129,0.3);
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="app-wrapper">
+
+    <!-- TOP HEADER -->
+
+    <div class="topbar">
+
+        <div class="top-left">
+
+            <div class="top-logo">
+                Niassist
+            </div>
+
+            <div class="top-subtitle">
+                Assistant Interface
+            </div>
+
+        </div>
+
+        <div class="top-right">
+
+            <div class="top-status">
+
+                <div class="top-dot"></div>
+
+                <span>AI Active</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MAIN CONTAINER -->
+
+    <div class="container">
+
+        <!-- Sidebar -->
+
+        <div class="sidebar">
+
+            <div>
+
+                <div class="logo">Niassist</div>
+
+                <div class="subtitle">
+                    Calm futuristic AI assistant for productivity, coding and automation.
+                </div>
+
+            </div>
+
+            <div class="menu">
+
+                <div class="suggestion-title">
+                    Suggestions
+                </div>
+
+                <div class="menu-item" onclick="fillSuggestion(this)">
+                    Explain recursion in simple terms
+                </div>
+
+                <div class="menu-item" onclick="fillSuggestion(this)">
+                    Open YouTube and play lofi music
+                </div>
+
+                <div class="menu-item" onclick="fillSuggestion(this)">
+                    Generate a Python login system
+                </div>
+
+                <div class="menu-item" onclick="fillSuggestion(this)">
+                    Summarize today's AI news
+                </div>
+
+                <div class="menu-item" onclick="fillSuggestion(this)">
+                    Create a Flask portfolio website
+                </div>
+
+                <div class="menu-item" onclick="fillSuggestion(this)">
+                    Explain Dijkstra's Algorithm
+                </div>
+
+                <div class="menu-item" onclick="fillSuggestion(this)">
+                    Build a machine learning roadmap
+                </div>
+
+                <div class="menu-item" onclick="fillSuggestion(this)">
+                    Optimize my resume for placements
+                </div>
+
+            </div>
+
+            <div class="status">
+
+                <div>AI Status</div>
+
+                <div class="online">
+
+                    <div class="dot"></div>
+
+                    <span>Online & Active</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Main -->
+
+        <div class="main">
+
+            <div class="header">
+
+                <div>
+
+                    <h2>Assistant Interface</h2>
+
+                    <p>Calm • Intelligent • Interactive</p>
+
+                </div>
+
+                <div class="avatar"></div>
+
+            </div>
+
+            <!-- TOP WIDGETS -->
+
+            <div class="top-widgets">
+
+                <div class="widget">
+
+                    <div class="widget-label">
+                        AI MODEL
+                    </div>
+
+                    <div class="widget-value">
+                        Gemini Powered
+                    </div>
+
+                </div>
+
+                <div class="widget">
+
+                    <div class="widget-label">
+                        RESPONSE MODE
+                    </div>
+
+                    <div class="widget-value">
+                        Intelligent Assist
+                    </div>
+
+                </div>
+
+                <div class="widget">
+
+                    <div class="widget-label">
+                        STATUS
+                    </div>
+
+                    <div class="widget-value green">
+                        Active
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- CHAT -->
+
+            <div class="chat-box" id="chatBox">
+
+                <div class="message bot">
+                    Welcome to Niassist. How can I help you today?
+                </div>
+
+            </div>
+
+            <!-- INPUT -->
+
+            <div class="input-area">
+
+                <input
+                    type="text"
+                    id="command"
+                    placeholder="Ask Niassist anything..."
+                >
+
+                <button class="mic-btn" onclick="startListening()">
+                    🎤
+                </button>
+
+                <button class="send-btn" onclick="sendCommand()">
+                    Send
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function addMessage(text, className){
+
+    let chatBox = document.getElementById("chatBox");
+
+    let div = document.createElement("div");
+
+    div.classList.add("message", className);
+
+    div.innerText = text;
+
+    chatBox.appendChild(div);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function sendCommand(){
+
+    let input = document.getElementById("command");
+
+    let text = input.value;
+
+    if(text.trim() === "") return;
+
+    addMessage(text, "user");
+
+    input.value = "";
+
+    addMessage("Niassist is thinking...", "bot");
+
+    fetch("/command",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            text:text
+        })
+
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        let bots = document.querySelectorAll(".bot");
+
+        bots[bots.length - 1].innerText = data.response;
+
+        if(data.url){
+            window.open(data.url, "_blank");
+        }
+
+    })
+
+    .catch(err => {
+
+        let bots = document.querySelectorAll(".bot");
+
+        bots[bots.length - 1].innerText =
+        "Something went wrong.";
+
+        console.log(err);
+    });
+}
+
+function fillSuggestion(element){
+
+    document.getElementById("command").value =
+    element.innerText;
+}
+
+function startListening(){
+
+    const recognition = new webkitSpeechRecognition();
+
+    recognition.lang = "en-US";
+
+    recognition.onresult = function(event){
+
+        const transcript = event.results[0][0].transcript;
+
+        document.getElementById("command").value = transcript;
+
+        sendCommand();
+    };
+
+    recognition.start();
+}
+
+document.getElementById("command")
+.addEventListener("keypress", function(event){
+
+    if(event.key === "Enter"){
+        sendCommand();
+    }
+});
+
+</script>
+
+</body>
+</html>
