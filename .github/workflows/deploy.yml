@@ -1,4 +1,4 @@
-name: Niassist CI/CD
+name: Deploy to EC2
 
 on:
   push:
@@ -6,26 +6,21 @@ on:
       - main
 
 jobs:
-
-  build-and-test:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
 
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Verify Flask App
-        run: |
-          python -m py_compile app.py
+          script: |
+            cd ~/Niassist
+            git pull origin main
+            source venv/bin/activate
+            pkill gunicorn || true
+            nohup gunicorn -w 4 -b 127.0.0.1:8000 app:app > gunicorn.log 2>&1 &
