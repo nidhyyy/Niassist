@@ -3,3 +3,25 @@ __pycache__/
 *.pyc
 .env
 .vscode/
+.venv/
+.pytest_cache/
+.env.*
+!.env.example
+
+.venv*/
+
+instance/
+*.sqlite3
+
+node_modules/
+
+# Local output and credentials
+*.log
+*.sqlite3-*
+*.db
+*.db-*
+*.pem
+*.key
+backups/
+.coverage
+htmlcov/

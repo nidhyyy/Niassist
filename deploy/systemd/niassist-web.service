@@ -1,0 +1,29 @@
+[Unit]
+Description=Niassist web API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=niassist
+Group=niassist
+WorkingDirectory=/opt/niassist/current
+EnvironmentFile=/etc/niassist/niassist.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/niassist/current/.venv/bin/gunicorn --config deploy/gunicorn.conf.py app:app
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+KillSignal=SIGTERM
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/niassist
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=1G
+
+[Install]
+WantedBy=multi-user.target
