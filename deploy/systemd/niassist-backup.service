@@ -1,0 +1,13 @@
+[Unit]
+Description=Snapshot Niassist database and session key
+
+[Service]
+Type=oneshot
+User=niassist
+Group=niassist
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/backups/niassist
+ExecStart=/opt/niassist/current/.venv/bin/python /opt/niassist/current/scripts/backup.py --database /var/lib/niassist/chats.sqlite3 --destination /var/backups/niassist --secret /var/lib/niassist/session-secret

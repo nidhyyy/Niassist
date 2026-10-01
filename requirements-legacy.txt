@@ -1,0 +1,5 @@
+# Optional dependencies for the separate legacy/main.py desktop assistant.
+SpeechRecognition>=3.14,<4
+selenium>=4.30,<5
+webdriver-manager>=4,<5
+# Microphone input also needs PyAudio and platform-specific audio support.

@@ -1,26 +1,43 @@
-name: Deploy to EC2
-
+name: Tested EC2 release
 on:
   push:
-    branches:
-      - main
-
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: niassist-production
+  cancel-in-progress: false
 jobs:
+  tests:
+    uses: ./.github/workflows/test.yml
   deploy:
+    needs: tests
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
-
+    environment: production
+    timeout-minutes: 20
     steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
-
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-
-          script: |
-            cd ~/Niassist
-            git pull origin main
-            source venv/bin/activate
-            pkill gunicorn || true
-            nohup gunicorn -w 4 -b 127.0.0.1:8000 app:app > gunicorn.log 2>&1 &
+      - name: Deploy the tested commit using a verified SSH host key
+        shell: bash
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EC2_HOST" =~ ^[A-Za-z0-9.-]+$ ]]
+          [[ "$EC2_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$RELEASE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          umask 077
+          key_file="$RUNNER_TEMP/niassist-ssh-key"
+          hosts_file="$RUNNER_TEMP/niassist-known-hosts"
+          trap 'rm -f "$key_file" "$hosts_file"' EXIT
+          printf '%s\n' "$EC2_SSH_KEY" > "$key_file"
+          printf '%s\n' "$EC2_KNOWN_HOSTS" > "$hosts_file"
+          ssh -i "$key_file" -o BatchMode=yes -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$hosts_file" \
+            -o ConnectTimeout=15 "$EC2_USER@$EC2_HOST" \
+            "sudo -n /usr/local/sbin/niassist-release $RELEASE_SHA"

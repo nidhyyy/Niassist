@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Niassist database backup
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

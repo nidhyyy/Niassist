@@ -1,0 +1,28 @@
+# Included from nginx.conf's http block (Ubuntu sites-enabled).
+limit_req_zone $binary_remote_addr zone=niassist_auth:10m rate=10r/m;
+limit_req_zone $binary_remote_addr zone=niassist_ai:10m rate=12r/m;
+
+server {
+    listen 80;
+    server_name DOMAIN_NAME;
+    # Certbot adds TLS and an HTTP-to-HTTPS redirect after DNS is ready.
+    client_max_body_size 6m;
+    server_tokens off;
+    gzip off;
+
+    location = /ready { deny all; }
+
+    location ~ ^/api/auth/(login|register)$ {
+        limit_req zone=niassist_auth burst=10 nodelay;
+        limit_req_status 429;
+        include /etc/nginx/snippets/niassist-proxy.conf;
+    }
+    location ~ ^(/command(/stream)?|/api/documents/ask|/api/tasks/suggest)$ {
+        limit_req zone=niassist_ai burst=8 nodelay;
+        limit_req_status 429;
+        include /etc/nginx/snippets/niassist-proxy.conf;
+    }
+    location / {
+        include /etc/nginx/snippets/niassist-proxy.conf;
+    }
+}
